@@ -39,7 +39,6 @@
   "husky": {
     "hooks": {
       "_comment": "Use --no-verify to bypass",
-      "pre-commit": "lint-staged && pretty-quick --staged",
       "pre-push": "yarn lint"
     }
   },
