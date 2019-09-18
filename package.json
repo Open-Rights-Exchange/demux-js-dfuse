@@ -20,9 +20,8 @@
   "scripts": {
     "check": "yarn lint && yarn test && yarn build",
     "prepublishOnly": "yarn build && yarn test",
-    "postinstall": "yarn build",
     "prebuild": "rimraf docs dist",
-    "build": "yarn run build:cjs && yarn run build:es && yarn run build:umd && yarn run build:docs",
+    "build": "yarn run build:cjs",
     "build:cjs": "tsc --module commonjs",
     "build:es": "rollup -c rollup.config.es.js",
     "build:umd": "rollup -c rollup.config.umd.js && node scripts/compress-umd-build.js",
