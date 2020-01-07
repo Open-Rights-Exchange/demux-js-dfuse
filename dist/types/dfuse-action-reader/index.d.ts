@@ -1,9 +1,12 @@
+import { FetchPolicy } from "apollo-client";
 import { ActionReader, ActionReaderOptions, Block, BlockInfo, NextBlock, ReaderInfo } from "demux";
 import { DfuseBlockStreamer } from "../dfuse-block-streamer";
 declare type DfuseActionReaderOptions = ActionReaderOptions & {
     dfuseApiKey: string;
     network?: string;
     query?: string;
+    maxBlockQueueLength?: number;
+    fetchPolicy: FetchPolicy;
 };
 /**
  * Implements a demux-js ActionReader (see https://github.com/EOSIO/demux-js for more information).
@@ -29,6 +32,7 @@ export declare class DfuseActionReader implements ActionReader {
     currentBlockNumber: number;
     protected activeCursor: string;
     protected blockQueue: NextBlock[];
+    protected maxBlockQueueLength: number;
     protected blockStreamer: DfuseBlockStreamer;
     protected onlyIrreversible: boolean;
     protected currentBlockData: Block;
@@ -46,7 +50,7 @@ export declare class DfuseActionReader implements ActionReader {
     getHeadBlockNumber(): Promise<number>;
     getLastIrreversibleBlockNumber(): Promise<number>;
     protected getDefaultBlock(blockInfo: Partial<BlockInfo>): Block;
-    readonly info: ReaderInfo;
+    get info(): ReaderInfo;
     private acceptBlock;
 }
 export {};

@@ -1,7 +1,7 @@
 import Logger, { createLogger, LogLevel } from "bunyan"
 import { NextBlock } from "demux"
 import { getApolloClient } from "./dfuse-api"
-import ApolloClient from "apollo-client"
+import ApolloClient, { FetchPolicy } from "apollo-client"
 import { gql } from "apollo-boost"
 import { Transaction } from "../types"
 
@@ -12,6 +12,7 @@ export type DfuseBlockStreamerOptions = {
   query?: string
   onlyIrreversible: boolean
   logLevel?: LogLevel
+  fetchPolicy?: FetchPolicy
 }
 
 type OnBlockListener = (nextBlock: NextBlock) => void
@@ -38,6 +39,7 @@ export class DfuseBlockStreamer {
   private lastPublishedBlock?: NextBlock
   private transactionProcessing: Promise<void> = Promise.resolve()
   private liveMarkerReached: boolean = false
+  private fetchPolicy: FetchPolicy
 
   constructor(options: DfuseBlockStreamerOptions) {
     const { logLevel, lowBlockNum, onlyIrreversible } = options
@@ -51,6 +53,7 @@ export class DfuseBlockStreamer {
     this.network = options.network || "mainnet"
     this.query = options.query || "status:executed"
     this.onlyIrreversible = typeof onlyIrreversible !== "undefined" ? onlyIrreversible : false
+    this.fetchPolicy = options.fetchPolicy || 'no-cache'
 
     this.log.trace("DfuseBlockStreamer", {
       lowBlockNum: this.lowBlockNum,
@@ -229,7 +232,8 @@ export class DfuseBlockStreamer {
         query: this.query,
         onlyIrreversible: this.onlyIrreversible,
         lowBlockNum: this.lowBlockNum
-      }
+      },
+      fetchPolicy: this.fetchPolicy,
     })
   }
 

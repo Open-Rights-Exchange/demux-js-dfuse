@@ -36,6 +36,7 @@ class DfuseBlockStreamer {
         this.network = options.network || "mainnet";
         this.query = options.query || "status:executed";
         this.onlyIrreversible = typeof onlyIrreversible !== "undefined" ? onlyIrreversible : false;
+        this.fetchPolicy = options.fetchPolicy || 'no-cache';
         this.log.trace("DfuseBlockStreamer", {
             lowBlockNum: this.lowBlockNum,
             hasDfuseApiKey: !!options.dfuseApiKey,
@@ -196,7 +197,8 @@ class DfuseBlockStreamer {
                 query: this.query,
                 onlyIrreversible: this.onlyIrreversible,
                 lowBlockNum: this.lowBlockNum
-            }
+            },
+            fetchPolicy: this.fetchPolicy,
         });
     }
     addOnBlockListener(callback) {

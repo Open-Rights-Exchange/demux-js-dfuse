@@ -1,4 +1,6 @@
 import Logger, { createLogger, LogLevel } from "bunyan"
+import { FetchPolicy } from "apollo-client"
+
 import { ActionReader, ActionReaderOptions, Block, BlockInfo, NextBlock, ReaderInfo } from "demux"
 import { DfuseBlockStreamer } from "../dfuse-block-streamer"
 import { waitUntil, getBlockNumber } from "../util"
@@ -7,6 +9,8 @@ type DfuseActionReaderOptions = ActionReaderOptions & {
   dfuseApiKey: string
   network?: string
   query?: string
+  maxBlockQueueLength?: number
+  fetchPolicy: FetchPolicy
 }
 
 /**
@@ -33,6 +37,7 @@ export class DfuseActionReader implements ActionReader {
   public currentBlockNumber: number
   protected activeCursor: string = ""
   protected blockQueue: NextBlock[] = []
+  protected maxBlockQueueLength = 200
   protected blockStreamer: DfuseBlockStreamer
   protected onlyIrreversible: boolean
   protected currentBlockData: Block = defaultBlock
@@ -64,7 +69,8 @@ export class DfuseActionReader implements ActionReader {
       network,
       query,
       onlyIrreversible: this.onlyIrreversible,
-      lowBlockNum: this.startAtBlock
+      lowBlockNum: this.startAtBlock,
+      fetchPolicy: optionsWithDefaults.fetchPolicy,
     })
 
     this.onBlock = this.onBlock.bind(this)
@@ -128,6 +134,10 @@ export class DfuseActionReader implements ActionReader {
     )
 
     this.blockQueue.push(nextBlock)
+
+    if (this.blockQueue.length > this.maxBlockQueueLength) {
+      this.blockQueue.pop()
+    }
   }
 
   public async getBlock(requestedBlockNumber: number): Promise<Block> {

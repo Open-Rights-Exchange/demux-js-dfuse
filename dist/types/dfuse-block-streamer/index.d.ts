@@ -1,6 +1,6 @@
 import { LogLevel } from "bunyan";
 import { NextBlock } from "demux";
-import ApolloClient from "apollo-client";
+import ApolloClient, { FetchPolicy } from "apollo-client";
 export declare type DfuseBlockStreamerOptions = {
     dfuseApiKey: string;
     network?: string;
@@ -8,6 +8,7 @@ export declare type DfuseBlockStreamerOptions = {
     query?: string;
     onlyIrreversible: boolean;
     logLevel?: LogLevel;
+    fetchPolicy?: FetchPolicy;
 };
 declare type OnBlockListener = (nextBlock: NextBlock) => void;
 /**
@@ -32,6 +33,7 @@ export declare class DfuseBlockStreamer {
     private lastPublishedBlock?;
     private transactionProcessing;
     private liveMarkerReached;
+    private fetchPolicy;
     constructor(options: DfuseBlockStreamerOptions);
     protected getApolloClient(): ApolloClient<import("apollo-boost").NormalizedCacheObject>;
     /**

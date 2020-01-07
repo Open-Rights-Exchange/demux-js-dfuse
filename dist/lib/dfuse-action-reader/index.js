@@ -35,6 +35,7 @@ class DfuseActionReader {
         this.headBlockNumber = 0;
         this.activeCursor = "";
         this.blockQueue = [];
+        this.maxBlockQueueLength = 200;
         this.currentBlockData = defaultBlock;
         this.lastIrreversibleBlockNumber = 0;
         this.initialized = false;
@@ -53,7 +54,8 @@ class DfuseActionReader {
             network,
             query,
             onlyIrreversible: this.onlyIrreversible,
-            lowBlockNum: this.startAtBlock
+            lowBlockNum: this.startAtBlock,
+            fetchPolicy: optionsWithDefaults.fetchPolicy,
         });
         this.onBlock = this.onBlock.bind(this);
         this.streamBlocks();
@@ -106,6 +108,9 @@ class DfuseActionReader {
          */
         this.lastIrreversibleBlockNumber = Math.max(this.lastIrreversibleBlockNumber, nextBlock.lastIrreversibleBlockNumber);
         this.blockQueue.push(nextBlock);
+        if (this.blockQueue.length > this.maxBlockQueueLength) {
+            this.blockQueue.pop();
+        }
     }
     getBlock(requestedBlockNumber) {
         return __awaiter(this, void 0, void 0, function* () {
